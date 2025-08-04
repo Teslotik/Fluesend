@@ -1,0 +1,7 @@
+-cp .
+
+-cp ../../source
+
+--main Chat
+
+--hl export/app.hl

@@ -1,0 +1,8 @@
+-cp .
+
+-cp ../../source
+
+# --main P2PChat
+--main NewP2PChat
+
+--hl export/app.hl

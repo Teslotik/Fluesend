@@ -1,0 +1,7 @@
+-cp .
+
+-cp ../../source
+
+--main Ping
+
+--hl export/app.hl

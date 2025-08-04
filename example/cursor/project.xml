@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="Cursor" package="org.teslotik.cursor" version="1.0.0" company="Teslotik" />
+	<app main="Main" path="Export" file="cursor" />
+	
+    <window width="640" height="480" fps="60" background="#000000" hardware="true" vsync="false" />
+	
+	<source path="Source" />
+
+    <haxelib name="flixel" />
+	<classpath path="../../source" />
+
+	<set name="BUILD_DIR" value="export" />
+	
+</project>

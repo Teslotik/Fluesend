@@ -1,0 +1,10 @@
+.vscode/
+
+bin/
+export/
+dump/
+.unittest/
+
+stuff/
+
+.DS_Store

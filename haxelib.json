@@ -1,0 +1,11 @@
+{
+  "name": "fluesend",
+  "url" : "https://github.com/Teslotik/Fluesend",
+  "license": "MIT",
+  "tags": ["multiplayer", "networking", "net", "tcp", "udp", "websockets", "cross"],
+  "description": "Easy-to-use multiplayer library with a unified codebase for both server and client",
+  "version": "0.0.1",
+  "classPath": "source/",
+  "releasenote": "Alpha release.",
+  "contributors": ["Teslotik"]
+}
