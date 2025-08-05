@@ -271,7 +271,7 @@ class Socket {
                             var key = request.headers.get("sec-websocket-key");
                             var response:Response = {
                                 version: request.version,
-                                code: 101,
+                                code: "101",
                                 status: "Switching Protocols",
                                 headers: [
                                     "Upgrade" => "websocket",

@@ -2,7 +2,7 @@ package fluesend;
 
 typedef Response = {
     version:String,
-    code:Int,
+    code:String,
     status:String,
     headers:Map<String, String>,
     body:Dynamic

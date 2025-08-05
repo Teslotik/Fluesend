@@ -248,7 +248,7 @@ class Serializer {
                     if (key == this)
                         break;
                     if (useMarkedFields && (!meta.exists(key) || !Reflect.hasField(meta.get(key), "s")))
-                        "Field must be marked as @s";
+                        throw "Field must be marked as @s";
                     var value:Dynamic = walk();
                     Reflect.setField(instance, key, value);
                 }

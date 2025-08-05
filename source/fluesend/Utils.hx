@@ -41,29 +41,33 @@ class Utils {
         return meta;
     }
 
+    public static function validateHttpVersion(version:String) {
+        switch version {
+            case "HTTP/0.9":
+            case "HTTP/1.0":
+            case "HTTP/1.1":
+            case "HTTP/2":
+            case "HTTP/3":
+            default:
+                return false;
+        }
+        return true;
+    }
+
     public static function parseHttpRequest(data:Bytes) {
         var pos = 0;
         var string = "";
 
         function nextChar(char:String) {
-            for (i in pos...string.length) {
-                if (string.charAt(i) == char) {
-                    pos = i + 1;
-                    return i;
-                }
-            }
-            pos = string.length;
-            return pos;
-        }
+			pos = string.indexOf(char, pos);
+			if (pos == -1)
+				return pos = string.length;
+			return pos++;
+		}
 
         function nextValue() {
-            for (i in pos...string.length) {
-                if (string.charAt(i) != ":" && string.charAt(i) != " ") {
-                    pos = i;
-                    return i;
-                }
-            }
-            pos = string.length;
+            while (string.charAt(pos) == " ")
+                pos++;
             return pos;
         }
 
@@ -84,16 +88,9 @@ class Utils {
         request.path = string.substring(pos, nextChar(" "));
         request.version = string.substring(pos, nextChar(" "));
 
-        // Validate request line
-        switch request.version {
-            case "HTTP/0.9":
-            case "HTTP/1.0":
-            case "HTTP/1.1":
-            case "HTTP/2":
-            case "HTTP/3":
-            default:
-                return null;
-        }
+        // Validations
+        if (!validateHttpVersion(request.version))
+            return null;
         /// @todo path validation
 
         // Read headers
@@ -114,13 +111,102 @@ class Utils {
         return request;
     }
 
+    public static function parseHttpResponse(data:Bytes) {
+        var pos = 0;
+        var string = "";
+
+        function nextChar(char:String) {
+			pos = string.indexOf(char, pos);
+			if (pos == -1)
+				return pos = string.length;
+			return pos++;
+		}
+
+        function nextValue() {
+            while (string.charAt(pos) == " ")
+                pos++;
+            return pos;
+        }
+
+        var response:Response = {
+            version: "HTTP/1.1",
+            code: "200",
+            status: "OK",
+            headers: new Map<String, String>(),
+            body: null
+        };
+        
+        var input = new BytesInput(data);
+        
+        // Read response line
+        pos = 0;
+        string = input.readLine();
+        response.version = string.substring(pos, nextChar(" "));
+        response.code = string.substring(pos, nextChar(" "));
+        response.status = string.substring(pos, string.length);
+
+        // Validations
+        if (!validateHttpVersion(response.version))
+            return null;
+
+        // Read headers
+        while (true) {
+            pos = 0;
+            string = input.readLine();
+            if (string.length == 0)
+                break;
+            response.headers.set(
+                string.substring(pos, nextChar(":")).toLowerCase(),
+                string.substring(nextValue(), string.length)
+            );
+        }
+
+        // Read payload
+        response.body = input.readAll();
+
+        return response;
+    }
+
+    public static function composeHttpRequest(request:Request) {
+        var output = new BytesOutput();
+        
+        // Write request line
+        output.writeString(request.method);
+        output.writeString(" ");
+        output.writeString(request.path);
+        output.writeString(" ");
+        output.writeString(request.version);
+        output.writeString("\r\n");
+
+        // Write headers
+        for (key => value in request.headers) {
+            output.writeString(key);
+            output.writeString(": ");
+            output.writeString(value);
+            output.writeString("\r\n");
+        }
+
+        output.writeString("\r\n");
+
+        // Write payload
+        if (request.body is Bytes) {
+            output.write(request.body);
+        } else if (request.body is String) {
+            output.writeString(request.body);
+        } else if (request.body != null) {
+            trace("Unknown format", request.body);
+        }
+
+        return output.getBytes();
+    }
+
     public static function composeHttpResponse(response:Response) {
         var output = new BytesOutput();
         
         // Write response line
         output.writeString(response.version);
         output.writeString(" ");
-        output.writeString(Std.string(response.code));
+        output.writeString(response.code);
         output.writeString(" ");
         output.writeString(response.status);
         output.writeString("\r\n");
